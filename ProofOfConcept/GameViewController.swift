@@ -20,6 +20,8 @@ class GameViewController: UIViewController {
         return self.view as? SKView
     }
 
+    var scnNode: SK3DNode?
+
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -43,7 +45,7 @@ class GameViewController: UIViewController {
         scnNode.scnScene = scene
 
         // 6.  Create an SKScene
-        let skScene = SKScene(size: view.frame.size)
+        let skScene = WorkaroundScene(size: view.frame.size)
 
         // 7.  Position and add the SK3DNode to the SKScene:
         scnNode.position = CGPoint(x: skScene.frame.midX, y: skScene.frame.midY)
@@ -53,6 +55,21 @@ class GameViewController: UIViewController {
         skView.presentScene(skScene)
 
         // BUG: Note that the ship does not animate, unless you tap the view, then you get an updated redraw of the scene
+
+        self.scnNode = scnNode
+    }
+
+    class WorkaroundScene: SKScene {
+
+        override func update(_ currentTime: TimeInterval) {
+            super.update(currentTime)
+
+            for child in children {
+                if let sk3dNode = child as? SK3DNode {
+                    sk3dNode.xScale = sk3dNode.xScale
+                }
+            }
+        }
     }
     
     override var shouldAutorotate: Bool {
